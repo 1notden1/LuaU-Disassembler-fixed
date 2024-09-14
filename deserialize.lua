@@ -19,17 +19,17 @@ local function Deserialize(bytecode)
         return b
     end
 
-    local function readVarInt()
-        local result, shift, byte = 0, 0
-
-        repeat
-            byte = gBits8()
-            result = result + bit.lshift(bit.band(byte, 127), shift)
-            shift = shift + 7
-        until bit.band(byte, 128) == 0
-
-        return result
-    end
+	function self:nextVarInt()
+		local result = 0
+		for i = 0, 4 do
+			local b = self:nextByte()
+			result = bit32.bor(result, bit32.lshift(bit32.band(b, 0x7F), i * 7))
+			if not bit32.btest(b, 0x80) then
+				break
+			end
+		end
+		return result
+	end
 
     local function gString()
         local len = readVarInt()
