@@ -75,5 +75,6 @@ return {
     ["LOP_FASTCALL1"]= 74,
     ["LOP_FASTCALL2"]= 75,
     ["LOP_FASTCALL2K"]= 76,
-    ["LOP__COUNT"]= 77    
+    ["LOP_FASTCALL3"]= 77,
+    ["LOP__COUNT"]= 78
 }
