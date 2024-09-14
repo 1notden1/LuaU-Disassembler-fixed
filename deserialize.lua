@@ -40,7 +40,7 @@ local function Deserialize(bytecode)
 
     local version = gBits8()
     print(version)
-    assert(version == 5, "bytecode version mismatch")
+    assert(version == 6, "bytecode version mismatch")
 
     local strings = {}
     local stringCount = readVarInt()
