@@ -4,7 +4,7 @@ Disassembles LuaU code using bytecode
 # Usage
 ```lua
 local import = function(file)
-  return loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/DJYazan/LuaU-Disassembler-fixed/main/%s.lua"):format(file)), file .. ".lua")()
+  return loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/playvoras/LuaU-Disassembler-fixed/main/%s.lua"):format(file)), file .. ".lua")()
 end
 
 local opCodes = import("opCodes")
