@@ -14,15 +14,13 @@ local function Deserialize(bytecode)
     -- Helper function to read a single byte
     local function gBits8() 
         if offset > #bytecode then
-            error("Offset exceeds bytecode length")
+            error("Attempt to read beyond bytecode length.")
         end
-
-        local b = string.byte(bytecode, offset, offset)
+        local b = string.byte(bytecode, offset)
         offset = offset + 1
         return b
     end
 
-    -- Table to hold the methods for deserialization
     local self = {}
 
     function self:nextByte()
@@ -42,19 +40,16 @@ local function Deserialize(bytecode)
     end
 
     local function gString()
-        local len = self:nextVarInt()  -- Use nextVarInt to get the length
-        
-        if len + offset - 1 > #bytecode then
-            error("String length exceeds bytecode length")
+        local len = self:nextVarInt()  -- Get the length of the string
+        if len < 0 or offset + len - 1 > #bytecode then
+            error("Invalid string length or offset exceeds bytecode length.")
         end
-
         local ret = string.sub(bytecode, offset, offset + len - 1)
         offset = offset + len
         return ret
     end
 
-    -- Read version
-    local version = self:nextByte()
+    local version = gBits8()
     assert(version == 6, "bytecode version mismatch")
 
     local strings = {}
@@ -70,7 +65,11 @@ local function Deserialize(bytecode)
         instructions[i] = opcode
     end
 
-    return instructions
+    return {
+        version = version,
+        strings = strings,
+        instructions = instructions
+    }
 end
 
 return Deserialize
