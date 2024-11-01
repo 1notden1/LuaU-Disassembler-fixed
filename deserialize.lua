@@ -19,7 +19,7 @@ local function Deserialize(bytecode)
 
     local self = {}  -- Create a table to hold methods
 
-   local function self:nextByte()
+    function self:nextByte()
         return gBits8()  -- Get the next byte from the bytecode
     end
 
@@ -42,27 +42,27 @@ local function Deserialize(bytecode)
         return ret
     end
 
-    -- Check the version
+    -- Read the version and check for compatibility
     local version = gBits8()
-    print(version)
-    assert(version == 6, "bytecode version mismatch")
+    print("Bytecode Version:", version)
+    assert(version == 6, "Bytecode version mismatch")
 
-    -- Read string count
+    -- Read strings from bytecode
     local strings = {}
-    local stringCount = self:nextVarInt()
+    local stringCount = self:nextVarInt()  -- Get the number of strings
     for i = 1, stringCount do
-        strings[i] = gString()
+        strings[i] = gString()  -- Read each string
     end
 
-    -- Read instructions
+    -- Read instructions from bytecode
     local instructions = {}
-    local instructionCount = self:nextVarInt()
+    local instructionCount = self:nextVarInt()  -- Get the number of instructions
     for i = 1, instructionCount do
-        local opcode = self:nextByte()  -- Use self:nextByte() here
+        local opcode = self:nextByte()  -- Read each opcode
         instructions[i] = opcode
     end
 
-    return instructions
+    return instructions, strings  -- Return the instructions and strings
 end
 
 return Deserialize
