@@ -21,6 +21,7 @@ local function Deserialize(bytecode)
         return b
     end
 
+    -- Create a table to hold the deserialization methods
     local self = {}
 
     function self:nextByte()
@@ -29,35 +30,41 @@ local function Deserialize(bytecode)
 
     function self:nextVarInt()
         local result = 0
-        for i = 0, 4 do
+        local shift = 0
+        while shift < 35 do
             local b = self:nextByte()
-            result = bit32.bor(result, bit32.lshift(bit32.band(b, 0x7F), i * 7))
-            if not bit32.btest(b, 0x80) then
-                break
+            result = bit32.bor(result, bit32.lshift(bit32.band(b, 0x7F), shift))
+            if bit32.btest(b, 0x80) then
+                shift = shift + 7
+            else
+                return result
             end
         end
-        return result
+        error("VarInt too long")
     end
 
     local function gString()
-        local len = self:nextVarInt()  -- Get the length of the string
-        if len < 0 or offset + len - 1 > #bytecode then
-            error("Invalid string length or offset exceeds bytecode length.")
+        local len = self:nextVarInt()  -- Use nextVarInt to get the length
+        if offset + len - 1 > #bytecode then
+            error("Attempt to read string beyond bytecode length.")
         end
         local ret = string.sub(bytecode, offset, offset + len - 1)
         offset = offset + len
         return ret
     end
 
-    local version = gBits8()
+    -- Read the version byte (for example)
+    local version = self:nextByte()
     assert(version == 6, "bytecode version mismatch")
 
+    -- Deserialize strings
     local strings = {}
     local stringCount = self:nextVarInt()
     for i = 1, stringCount do
         strings[i] = gString()
     end
 
+    -- Deserialize instructions
     local instructions = {}
     local instructionCount = self:nextVarInt()
     for i = 1, instructionCount do
