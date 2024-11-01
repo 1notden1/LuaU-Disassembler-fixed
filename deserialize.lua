@@ -19,7 +19,7 @@ local function Deserialize(bytecode)
 
     local self = {}  -- Create a table to hold methods
 
-    function self:nextByte()
+   local function self:nextByte()
         return gBits8()  -- Get the next byte from the bytecode
     end
 
